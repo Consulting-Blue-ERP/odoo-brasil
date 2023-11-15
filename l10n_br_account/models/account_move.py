@@ -49,11 +49,11 @@ class AccountMove(models.Model):
 
             if self.is_sale_document(include_receipts=True):
                 move_lines = self.mapped("line_ids").filtered(
-                    lambda x: x.account_id.user_type_id.type == "receivable"
+                    lambda x: x.account_id.account_type == "asset_receivable"
                 )
             elif self.is_purchase_document(include_receipts=True):
                 move_lines = self.mapped("line_ids").filtered(
-                    lambda x: x.account_id.user_type_id.type == "payable"
+                    lambda x: x.account_id.account_type == "liability_payable"
                 )
 
             for line in move_lines:
@@ -231,13 +231,13 @@ class AccountMoveLine(models.Model):
         )
 
     @api.depends(
-        "debit", "credit", "account_id.internal_type", "amount_residual"
+        "debit", "credit", "account_id.account_type", "amount_residual"
     )
     def _compute_payment_value(self):
         for item in self:
             item.l10n_br_payment_value = (
                 item.debit
-                if item.account_id.internal_type == "receivable"
+                if item.account_id.account_type == "asset_receivable"
                 else item.credit * -1
             )
 
@@ -252,7 +252,7 @@ class AccountMoveLine(models.Model):
         dummy, act_id = self.env["ir.model.data"]._xmlid_to_res_model_res_id(
             "l10n_br_account.action_payment_account_move_line"
         )
-        receivable = self.account_id.internal_type == "receivable"
+        receivable = self.account_id.account_type == "asset_receivable"
         vals = self.env["ir.actions.act_window"].browse(act_id).read()[0]
         vals["context"] = {
             "default_amount": self.debit or self.credit,

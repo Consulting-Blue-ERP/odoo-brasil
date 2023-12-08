@@ -403,9 +403,9 @@ class EletronicDocument(models.Model):
             'finNFe': self.finalidade_emissao,
             'indFinal': self.ind_final or '1',
             'indPres': self.ind_pres or '1',
-            'indIntermed': self.ind_intermediario or '0',
+            # 'indIntermed': self.ind_intermediario or '0', #Intermed só preenche em alguns casos
             'procEmi': 0,
-            'verProc': 'Odoo 11 - Trustcode',
+            'verProc': 'Odoo 15 - Consulting Blue',
         }
         if self.ind_pres in ['2', '3', '4', '9']:
             ide['indIntermed'] = self.ind_intermediario or '0'
@@ -770,7 +770,7 @@ class EletronicDocument(models.Model):
 
         cert = self.company_id.with_context(
             {'bin_size': False}).l10n_br_certificate
-        cert_pfx = base64.decodestring(cert)
+        cert_pfx = base64.decodebytes(cert)
 
         certificado = Certificado(
             cert_pfx, self.company_id.l10n_br_cert_password)
@@ -786,7 +786,7 @@ class EletronicDocument(models.Model):
             raise UserError(mensagens_erro)
 
         self.sudo().write({
-            'xml_to_send': base64.encodestring(xml_enviar.encode('utf-8')),
+            'xml_to_send': base64.encodebytes(xml_enviar.encode('utf-8')),
             'xml_to_send_name': 'nfe-enviar-%s.xml' % self.numero,
         })
 
@@ -814,11 +814,11 @@ class EletronicDocument(models.Model):
         })
 
         cert = self.company_id.with_context({'bin_size': False}).l10n_br_certificate
-        cert_pfx = base64.decodestring(cert)
+        cert_pfx = base64.decodebytes(cert)
 
         certificado = Certificado(cert_pfx, self.company_id.l10n_br_cert_password)
 
-        xml_to_send = base64.decodestring(self.xml_to_send).decode('utf-8')
+        xml_to_send = base64.decodebytes(self.xml_to_send).decode('utf-8')
 
         resposta_recibo = None
         resposta = autorizar_nfe(
@@ -889,7 +889,7 @@ class EletronicDocument(models.Model):
         if self.codigo_retorno == '100':
             nfe_proc = gerar_nfeproc(resposta['sent_xml'], recibo_xml)
             self.sudo().write({
-                'nfe_processada': base64.encodestring(nfe_proc),
+                'nfe_processada': base64.encodebytes(nfe_proc),
                 'nfe_processada_name': "NFe%08d.xml" % self.numero,
             })
         _logger.info('NF-e (%s) was finished with status %s' % (
@@ -912,11 +912,11 @@ class EletronicDocument(models.Model):
                 ('name', 'like', 'nfe-envio')], limit=1)
             if nfe_envio.datas and recibo.datas:
                 nfe_proc = gerar_nfeproc(
-                    base64.decodestring(nfe_envio.datas).decode('utf-8'),
-                    base64.decodestring(recibo.datas).decode('utf-8'),
+                    base64.decodebytes(nfe_envio.datas).decode('utf-8'),
+                    base64.decodebytes(recibo.datas).decode('utf-8'),
                 )
                 self.sudo().write({
-                    'nfe_processada': base64.encodestring(nfe_proc),
+                    'nfe_processada': base64.encodebytes(nfe_proc),
                     'nfe_processada_name': "NFe%08d.xml" % self.numero,
                 })
         else:
@@ -966,7 +966,7 @@ class EletronicDocument(models.Model):
 
         _logger.info('Cancelling NF-e (%s)' % self.numero)
         cert = self.company_id.with_context({'bin_size': False}).l10n_br_certificate
-        cert_pfx = base64.decodestring(cert)
+        cert_pfx = base64.decodebytes(cert)
         certificado = Certificado(cert_pfx, self.company_id.l10n_br_cert_password)
 
         id_canc = "ID110111%s%02d" % (
@@ -1020,18 +1020,18 @@ class EletronicDocument(models.Model):
 
         self._create_attachment('canc', self, resp['sent_xml'])
         self._create_attachment('canc-ret', self, resp['received_xml'])
-        nfe_processada = base64.decodestring(self.nfe_processada)
+        nfe_processada = base64.decodebytes(self.nfe_processada)
 
         nfe_proc_cancel = gerar_nfeproc_cancel(
             nfe_processada, resp['received_xml'].encode())
         if nfe_proc_cancel:
-            self.nfe_processada = base64.encodestring(nfe_proc_cancel)
+            self.nfe_processada = base64.encodebytes(nfe_proc_cancel)
         _logger.info('Cancelling NF-e (%s) was finished with status %s' % (
             self.numero, self.codigo_retorno))
 
     def action_get_status(self):
         cert = self.company_id.with_context({'bin_size': False}).l10n_br_certificate
-        cert_pfx = base64.decodestring(cert)
+        cert_pfx = base64.decodebytes(cert)
         certificado = Certificado(cert_pfx, self.company_id.l10n_br_cert_password)
         consulta = {
             'estado': self.company_id.state_id.l10n_br_ibge_code,
@@ -1053,13 +1053,13 @@ class EletronicDocument(models.Model):
 
             self._create_attachment('canc', self, resp['sent_xml'])
             self._create_attachment('canc-ret', self, resp['received_xml'])
-            nfe_processada = base64.decodestring(self.nfe_processada)
+            nfe_processada = base64.decodebytes(self.nfe_processada)
 
             nfe_proc_cancel = gerar_nfeproc_cancel(
                 nfe_processada, resp['received_xml'].encode())
             if nfe_proc_cancel:
                 self.sudo().write({
-                    'nfe_processada': base64.encodestring(nfe_proc_cancel),
+                    'nfe_processada': base64.encodebytes(nfe_proc_cancel),
                 })
         else:
             message = "%s - %s" % (retorno_consulta.cStat,

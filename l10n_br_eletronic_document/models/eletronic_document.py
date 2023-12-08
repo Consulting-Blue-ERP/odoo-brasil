@@ -599,7 +599,7 @@ class EletronicDocument(models.Model):
         if self.state in ('draft', 'error'):
             cert = self.company_id.with_context(
                 {'bin_size': False}).l10n_br_certificate
-            cert_pfx = base64.decodestring(cert)
+            cert_pfx = base64.decodebytes(cert)
             certificado = Certificado(
                 cert_pfx, self.company_id.l10n_br_cert_password)
 
@@ -608,7 +608,7 @@ class EletronicDocument(models.Model):
 
             xml_enviar = xml_autorizar_nfe(certificado, **lote)
             self.sudo().write({
-                'xml_to_send': base64.encodestring(xml_enviar.encode('utf-8')),
+                'xml_to_send': base64.encodebytes(xml_enviar.encode('utf-8')),
                 'xml_to_send_name': 'nfe-enviar-%s.xml' % self.numero,
             })
 
@@ -933,9 +933,9 @@ class EletronicDocument(models.Model):
                 'nfse_pdf_name':  "NFe%08d.pdf" % response['entity']['numero_nfe'],
             }
             if response.get('xml', False):
-                vals['nfe_processada'] = base64.encodestring(response['xml'])
+                vals['nfe_processada'] = base64.encodebytes(response['xml'])
             if response.get('pdf', False):
-                vals['nfse_pdf'] = base64.encodestring(response['pdf'])
+                vals['nfse_pdf'] = base64.encodebytes(response['pdf'])
             if response.get('url_nfe', False):
                 vals['nfse_url'] = response['url_nfe']
 
@@ -967,10 +967,10 @@ class EletronicDocument(models.Model):
                     'nfse_pdf_name':  "NFe%08d.pdf" % response['entity']['numero_nfe'],
                 }
                 if response.get('xml', False):
-                    vals['nfe_processada'] = base64.encodestring(
+                    vals['nfe_processada'] = base64.encodebytes(
                         response['xml'])
                 if response.get('pdf', False):
-                    vals['nfse_pdf'] = base64.encodestring(response['pdf'])
+                    vals['nfse_pdf'] = base64.encodebytes(response['pdf'])
                 if response.get('url_nfe', False):
                     vals['nfse_url'] = response['url_nfe']
                 edoc.write(vals)

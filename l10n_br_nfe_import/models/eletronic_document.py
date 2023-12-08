@@ -620,7 +620,7 @@ class EletronicDocument(models.Model):
             partner_vals['company_id'])
         invoice_dict.update(partner_vals)
         invoice_dict.update({
-            'nfe_processada': base64.encodestring(nfe_xml),
+            'nfe_processada': base64.encodebytes(nfe_xml),
             'nfe_processada_name': "NFe%08d.xml" % nfe.NFe.infNFe.ide.nNF
         })
         invoice_dict.update(self.get_protNFe(nfe, company_id))
@@ -1009,7 +1009,7 @@ class EletronicDocument(models.Model):
             partner_vals['company_id'])
         invoice_dict.update(partner_vals)
         invoice_dict.update({
-            'nfe_processada': base64.encodestring(xml_nfe),
+            'nfe_processada': base64.encodebytes(xml_nfe),
             'nfe_processada_name': "NFe%08d.xml" % nfe.NFe.infNFe.ide.nNF
         })
         invoice_dict.update(self.get_protNFe(nfe, company_id))

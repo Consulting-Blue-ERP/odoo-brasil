@@ -262,7 +262,7 @@ class NfeMde(models.Model):
 
             if orig_file_cont:
                 self.write({
-                    'nfe_processada': base64.encodestring(orig_file_cont),
+                    'nfe_processada': base64.encodebytes(orig_file_cont),
                     'nfe_processada_name': file_name,
                 })
                 return True
@@ -281,7 +281,7 @@ class NfeMde(models.Model):
             if not item.nfe_processada:
                 raise UserError('Faça o download do xml antes de importar')
             invoice_eletronic = self.env['eletronic.document']
-            nfe_xml = base64.decodestring(item.nfe_processada)
+            nfe_xml = base64.decodebytes(item.nfe_processada)
             nfe = objectify.fromstring(nfe_xml)
 
             company = item.company_id

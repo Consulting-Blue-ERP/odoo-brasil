@@ -118,7 +118,7 @@ class NfeSchedule(models.TransientModel):
                             if obj_nfe:
                                 obj_nfe.write({
                                     'state': 'ciente',
-                                    'nfe_processada': base64.encodestring(
+                                    'nfe_processada': base64.encodebytes(
                                         nfe['xml']),
                                     'nfe_processada_name': "NFe%08d.xml" %
                                     infNfe.ide.nNF,
@@ -142,7 +142,7 @@ class NfeSchedule(models.TransientModel):
                                         '%Y-%m-%dT%H:%M:%S'),
                                     'company_id': company.id,
                                     'forma_inclusao': u'Verificação agendada',
-                                    'nfe_processada': base64.encodestring(
+                                    'nfe_processada': base64.encodebytes(
                                         nfe['xml']),
                                     'nfe_processada_name': "NFe%08d.xml" %\
                                     infNfe.ide.nNF

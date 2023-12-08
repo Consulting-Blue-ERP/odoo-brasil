@@ -50,7 +50,7 @@ class WizardImportNfe(models.TransientModel):
             for xml in xml_list:
                 with thezip.open(xml['name'], mode='w') as thefile:
                     thefile.write(xml['file'])
-        self.zip_file_error = base64.encodestring(mem_file.getvalue())
+        self.zip_file_error = base64.encodebytes(mem_file.getvalue())
 
     def _import_xml(self, xml):
         nfe = objectify.fromstring(xml)

@@ -29,7 +29,7 @@ class IrActionsReport(models.Model):
 
         nfe = self.env['eletronic.document'].search([('id', 'in', res_ids)])
 
-        nfe_xml = base64.decodestring(nfe.nfe_processada or nfe.xml_to_send)
+        nfe_xml = base64.decodebytes(nfe.nfe_processada or nfe.xml_to_send)
 
         cce_xml_element = []
         cce_list = self.env['ir.attachment'].search([
@@ -40,14 +40,14 @@ class IrActionsReport(models.Model):
 
         if cce_list:
             for cce in cce_list:
-                cce_xml = base64.decodestring(cce.datas)
+                cce_xml = base64.decodebytes(cce.datas)
                 cce_xml_element.append(etree.fromstring(cce_xml))
 
         logo = False
         if nfe.state != 'imported' and nfe.company_id.logo:
-            logo = base64.decodestring(nfe.company_id.logo)
+            logo = base64.decodebytes(nfe.company_id.logo)
         elif nfe.state != 'imported' and nfe.company_id.logo_web:
-            logo = base64.decodestring(nfe.company_id.logo_web)
+            logo = base64.decodebytes(nfe.company_id.logo_web)
 
         if logo:
             tmpLogo = BytesIO()

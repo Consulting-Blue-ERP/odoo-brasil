@@ -405,7 +405,7 @@ class EletronicDocument(models.Model):
             'indPres': self.ind_pres or '1',
             # 'indIntermed': self.ind_intermediario or '0', #Intermed só preenche em alguns casos
             'procEmi': 0,
-            'verProc': 'Odoo 15 - Consulting Blue',
+            'verProc': 'Odoo-15',
         }
         if self.ind_pres in ['2', '3', '4', '9']:
             ide['indIntermed'] = self.ind_intermediario or '0'
